@@ -201,7 +201,7 @@ export default function LandingPage() {
                </a>
 
                {/* 文档 5: 创世书 */}
-               <a href="/docs/genesis-book-mars.pdf" target="_blank" className="md:col-span-2 lg:col-span-2 group bg-gradient-to-r from-zinc-900 to-black border border-white/10 hover:border-white/30 p-6 rounded-xl relative overflow-hidden block cursor-zoom-in">
+               <a href="/docs/space2_genesis_book.pdf" target="_blank" className="md:col-span-2 lg:col-span-2 group bg-gradient-to-r from-zinc-900 to-black border border-white/10 hover:border-white/30 p-6 rounded-xl relative overflow-hidden block cursor-zoom-in">
                   <div className="absolute top-0 right-0 p-4 opacity-20 group-hover:opacity-40 transition-opacity">
                      <div className="text-6xl">📖</div>
                   </div>
