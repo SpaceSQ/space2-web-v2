@@ -145,6 +145,19 @@ export default function MasterPetSystem() {
      typingTimeoutRef.current = setTimeout(() => { setIsListening(false); }, 1500); 
   };
 
+  // 🔥 补全 handleAddNeuroTask 函数 🔥
+  const handleAddNeuroTask = (title: string, desc: string, actionText: string) => {
+      const newTask: TaskAlert = {
+          id: `task-${Date.now()}`,
+          type: 'SYSTEM',
+          title: title,
+          desc: desc,
+          actionText: actionText
+      };
+      setTasks(prev => [...prev, newTask]);
+      alert(`✅ 已将 [${title}] 任务添加至控制台首页待办列表。`);
+  };
+
   const executeAction = (actionName: string, reactionMood: 'CALM'|'JOY'|'SAD'|'ANGRY', reply: string, isSystemCommand = false) => {
      if (isOwner && isVisitingAway) return alert("通信阻断：该生命体当前不在你的庄园内！");
      if (!isOwner && isSystemCommand) return alert("权限拒绝：您不是造物主，无权下达系统级指令！");
@@ -188,7 +201,7 @@ export default function MasterPetSystem() {
     }, 500);
   };
 
-  // 🔥 补回了遗失的 handlePetInteraction 函数 🔥
+  // 🔥 补全 handlePetInteraction 函数 🔥
   const handlePetInteraction = () => {
      if (!isGuest) return;
      const actions = [{ desc: '互相闻了闻尾巴', score: 30 }, { desc: '在一起疯狂追逐打闹', score: 85 }, { desc: '因为抢玩具呲牙咧嘴', score: 10 }, { desc: '依偎在一起睡觉', score: 95 }];
