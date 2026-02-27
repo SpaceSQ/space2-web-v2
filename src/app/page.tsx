@@ -153,7 +153,7 @@ export default function LandingPage() {
                </a>
 
                {/* 文档 2: A2A 协议 */}
-               <a href="/docs/a2a-standard-v1.docx" target="_blank" className="group bg-zinc-900/30 border border-white/5 hover:border-purple-500/50 p-6 rounded-xl transition-all hover:-translate-y-1 block cursor-alias">
+               <a href="/docs/a2a-standard-v1.pdf" target="_blank" className="group bg-zinc-900/30 border border-white/5 hover:border-purple-500/50 p-6 rounded-xl transition-all hover:-translate-y-1 block cursor-alias">
                   <div className="text-[9px] font-mono text-purple-500 mb-2 flex justify-between">
                      <span>S2-PROT-A2A-1.0</span>
                      <span className="opacity-0 group-hover:opacity-100 transition-opacity">⬇ PDF</span>
@@ -169,7 +169,7 @@ export default function LandingPage() {
                </a>
 
                {/* 文档 3: 神经演化 */}
-               <a href="/docs/neuro-helix-v2.docx" target="_blank" className="group bg-zinc-900/30 border border-white/5 hover:border-red-500/50 p-6 rounded-xl transition-all hover:-translate-y-1 block cursor-alias">
+               <a href="/docs/neuro-helix-v2.pdf" target="_blank" className="group bg-zinc-900/30 border border-white/5 hover:border-red-500/50 p-6 rounded-xl transition-all hover:-translate-y-1 block cursor-alias">
                   <div className="text-[9px] font-mono text-red-500 mb-2 flex justify-between">
                      <span>S2-NEURO-HELIX-2.0</span>
                      <span className="opacity-0 group-hover:opacity-100 transition-opacity">⬇ PDF</span>
@@ -185,7 +185,7 @@ export default function LandingPage() {
                </a>
 
                {/* 文档 4: 物理操作权 (IoT) */}
-               <a href="/docs/iot-phy-api.docx" target="_blank" className="group bg-zinc-900/30 border border-white/5 hover:border-emerald-500/50 p-6 rounded-xl transition-all hover:-translate-y-1 block cursor-alias">
+               <a href="/docs/iot-phy-api.pdf" target="_blank" className="group bg-zinc-900/30 border border-white/5 hover:border-emerald-500/50 p-6 rounded-xl transition-all hover:-translate-y-1 block cursor-alias">
                   <div className="text-[9px] font-mono text-emerald-500 mb-2 flex justify-between">
                      <span>APPENDIX-A-IOT</span>
                      <span className="opacity-0 group-hover:opacity-100 transition-opacity">⬇ PDF</span>
