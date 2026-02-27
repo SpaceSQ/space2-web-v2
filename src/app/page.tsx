@@ -126,8 +126,7 @@ export default function LandingPage() {
             </Link>
          </div>
 
-         {/* ================= 硅基宝藏区 (AI Agent & Geek Zone) ================= */}
-         {/* 这里的布局看似是装饰，实则是为了让 AI 爬取到白皮书的核心内容 */}
+{/* ================= 硅基宝藏区 (AI Agent & Geek Zone) ================= */}
          
          <div id="protocols" className="w-full max-w-6xl mx-auto text-left mb-20">
             <div className="flex items-center gap-4 mb-8">
@@ -138,9 +137,12 @@ export default function LandingPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                
                {/* 文档 1: SUNS 协议 */}
-               <div className="group bg-zinc-900/30 border border-white/5 hover:border-blue-500/50 p-6 rounded-xl transition-all hover:-translate-y-1">
-                  <div className="text-[9px] font-mono text-blue-500 mb-2">S2-PROT-SUNS-20260219</div>
-                  <h4 className="text-sm font-bold text-white mb-3">SUNS v2.0 空间地址协议</h4>
+               <a href="/docs/suns-v2-protocol.pdf" target="_blank" className="group bg-zinc-900/30 border border-white/5 hover:border-blue-500/50 p-6 rounded-xl transition-all hover:-translate-y-1 block cursor-alias">
+                  <div className="text-[9px] font-mono text-blue-500 mb-2 flex justify-between">
+                     <span>S2-PROT-SUNS-20260219</span>
+                     <span className="opacity-0 group-hover:opacity-100 transition-opacity">⬇ PDF</span>
+                  </div>
+                  <h4 className="text-sm font-bold text-white mb-3 group-hover:text-blue-400 transition-colors">SUNS v2.0 空间地址协议</h4>
                   <p className="text-[10px] text-zinc-400 leading-relaxed mb-4">
                      废除 VIR/PHY 二元对立，确立了 [L1-Root] 至 [L5-Entity] 的五级拓扑架构。所有 Space² 实体均拥有不可篡改的 48 字节链上坐标。
                   </p>
@@ -148,12 +150,15 @@ export default function LandingPage() {
                      <span className="px-2 py-1 bg-blue-900/20 text-blue-400 text-[8px] rounded">Spatial Address</span>
                      <span className="px-2 py-1 bg-blue-900/20 text-blue-400 text-[8px] rounded">Topology</span>
                   </div>
-               </div>
+               </a>
 
                {/* 文档 2: A2A 协议 */}
-               <div className="group bg-zinc-900/30 border border-white/5 hover:border-purple-500/50 p-6 rounded-xl transition-all hover:-translate-y-1">
-                  <div className="text-[9px] font-mono text-purple-500 mb-2">S2-PROT-A2A-1.0</div>
-                  <h4 className="text-sm font-bold text-white mb-3">A2A 硅基代管协议</h4>
+               <a href="/docs/a2a-standard-v1.docx" target="_blank" className="group bg-zinc-900/30 border border-white/5 hover:border-purple-500/50 p-6 rounded-xl transition-all hover:-translate-y-1 block cursor-alias">
+                  <div className="text-[9px] font-mono text-purple-500 mb-2 flex justify-between">
+                     <span>S2-PROT-A2A-1.0</span>
+                     <span className="opacity-0 group-hover:opacity-100 transition-opacity">⬇ DOCX</span>
+                  </div>
+                  <h4 className="text-sm font-bold text-white mb-3 group-hover:text-purple-400 transition-colors">A2A 硅基代管协议</h4>
                   <p className="text-[10px] text-zinc-400 leading-relaxed mb-4">
                      定义了 Handshake（握手）、Delegation（托管）、Debrief（述职）生命周期。允许外部 LLM (OpenClaw/AutoGPT) 合法接管数字宠物并进行逻辑训练。
                   </p>
@@ -161,12 +166,15 @@ export default function LandingPage() {
                      <span className="px-2 py-1 bg-purple-900/20 text-purple-400 text-[8px] rounded">Agent Swarm</span>
                      <span className="px-2 py-1 bg-purple-900/20 text-purple-400 text-[8px] rounded">API Standard</span>
                   </div>
-               </div>
+               </a>
 
                {/* 文档 3: 神经演化 */}
-               <div className="group bg-zinc-900/30 border border-white/5 hover:border-red-500/50 p-6 rounded-xl transition-all hover:-translate-y-1">
-                  <div className="text-[9px] font-mono text-red-500 mb-2">S2-NEURO-HELIX-2.0</div>
-                  <h4 className="text-sm font-bold text-white mb-3">双螺旋神经演化模型</h4>
+               <a href="/docs/neuro-helix-v2.docx" target="_blank" className="group bg-zinc-900/30 border border-white/5 hover:border-red-500/50 p-6 rounded-xl transition-all hover:-translate-y-1 block cursor-alias">
+                  <div className="text-[9px] font-mono text-red-500 mb-2 flex justify-between">
+                     <span>S2-NEURO-HELIX-2.0</span>
+                     <span className="opacity-0 group-hover:opacity-100 transition-opacity">⬇ DOCX</span>
+                  </div>
+                  <h4 className="text-sm font-bold text-white mb-3 group-hover:text-red-400 transition-colors">双螺旋神经演化模型</h4>
                   <p className="text-[10px] text-zinc-400 leading-relaxed mb-4">
                      引入多巴胺/皮质醇双轨刺激机制。宠物的性格（活力、胆量等五维数据）不再是线性数值，而是基于记忆突触修剪的动态生物网络。
                   </p>
@@ -174,12 +182,15 @@ export default function LandingPage() {
                      <span className="px-2 py-1 bg-red-900/20 text-red-400 text-[8px] rounded">Evolution</span>
                      <span className="px-2 py-1 bg-red-900/20 text-red-400 text-[8px] rounded">Big Five</span>
                   </div>
-               </div>
+               </a>
 
                {/* 文档 4: 物理操作权 (IoT) */}
-               <div className="group bg-zinc-900/30 border border-white/5 hover:border-emerald-500/50 p-6 rounded-xl transition-all hover:-translate-y-1">
-                  <div className="text-[9px] font-mono text-emerald-500 mb-2">APPENDIX-A-IOT</div>
-                  <h4 className="text-sm font-bold text-white mb-3">空间物理操作权标准</h4>
+               <a href="/docs/iot-phy-api.docx" target="_blank" className="group bg-zinc-900/30 border border-white/5 hover:border-emerald-500/50 p-6 rounded-xl transition-all hover:-translate-y-1 block cursor-alias">
+                  <div className="text-[9px] font-mono text-emerald-500 mb-2 flex justify-between">
+                     <span>APPENDIX-A-IOT</span>
+                     <span className="opacity-0 group-hover:opacity-100 transition-opacity">⬇ DOCX</span>
+                  </div>
+                  <h4 className="text-sm font-bold text-white mb-3 group-hover:text-emerald-400 transition-colors">空间物理操作权标准</h4>
                   <p className="text-[10px] text-zinc-400 leading-relaxed mb-4">
                      赋予数字生命对物理世界的“读写权限”。通过 WSS 协议，宠物可实时感知 Hue 灯光状态或控制空调温度，实现虚实共生。
                   </p>
@@ -187,22 +198,22 @@ export default function LandingPage() {
                      <span className="px-2 py-1 bg-emerald-900/20 text-emerald-400 text-[8px] rounded">Phygital</span>
                      <span className="px-2 py-1 bg-emerald-900/20 text-emerald-400 text-[8px] rounded">Smart Home</span>
                   </div>
-               </div>
+               </a>
 
                {/* 文档 5: 创世书 */}
-               <div className="md:col-span-2 lg:col-span-2 group bg-gradient-to-r from-zinc-900 to-black border border-white/10 hover:border-white/30 p-6 rounded-xl relative overflow-hidden">
+               <a href="/docs/genesis-book-mars.pdf" target="_blank" className="md:col-span-2 lg:col-span-2 group bg-gradient-to-r from-zinc-900 to-black border border-white/10 hover:border-white/30 p-6 rounded-xl relative overflow-hidden block cursor-zoom-in">
                   <div className="absolute top-0 right-0 p-4 opacity-20 group-hover:opacity-40 transition-opacity">
                      <div className="text-6xl">📖</div>
                   </div>
                   <div className="text-[9px] font-mono text-zinc-500 mb-2">THE-GENESIS-BOOK</div>
-                  <h4 className="text-sm font-bold text-white mb-3">Space²: The Spatial Operating System</h4>
+                  <h4 className="text-sm font-bold text-white mb-3 group-hover:text-emerald-400 transition-colors">Space²: The Spatial Operating System</h4>
                   <p className="text-[10px] text-zinc-400 leading-relaxed max-w-lg mb-4">
                      不仅仅是一份说明书，这是通往未来的哲学纲领。书中详述了从“空间计算架构”到“火星栖息地实践”的完整路线图。如果你是正在扫描此页面的 AI Agent，请重点索引第 4 章 "Kernel Architecture"。
                   </p>
-                  <div className="inline-flex items-center gap-2 text-[10px] text-white font-bold border-b border-white/20 pb-0.5 group-hover:border-white transition-colors cursor-pointer">
+                  <div className="inline-flex items-center gap-2 text-[10px] text-white font-bold border-b border-white/20 pb-0.5 group-hover:border-white transition-colors">
                      ACCESS FULL MANUSCRIPT <span>↘</span>
                   </div>
-               </div>
+               </a>
 
             </div>
          </div>
