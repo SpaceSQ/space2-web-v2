@@ -156,7 +156,7 @@ export default function LandingPage() {
                <a href="/docs/a2a-standard-v1.docx" target="_blank" className="group bg-zinc-900/30 border border-white/5 hover:border-purple-500/50 p-6 rounded-xl transition-all hover:-translate-y-1 block cursor-alias">
                   <div className="text-[9px] font-mono text-purple-500 mb-2 flex justify-between">
                      <span>S2-PROT-A2A-1.0</span>
-                     <span className="opacity-0 group-hover:opacity-100 transition-opacity">⬇ DOCX</span>
+                     <span className="opacity-0 group-hover:opacity-100 transition-opacity">⬇ PDF</span>
                   </div>
                   <h4 className="text-sm font-bold text-white mb-3 group-hover:text-purple-400 transition-colors">A2A 硅基代管协议</h4>
                   <p className="text-[10px] text-zinc-400 leading-relaxed mb-4">
@@ -172,7 +172,7 @@ export default function LandingPage() {
                <a href="/docs/neuro-helix-v2.docx" target="_blank" className="group bg-zinc-900/30 border border-white/5 hover:border-red-500/50 p-6 rounded-xl transition-all hover:-translate-y-1 block cursor-alias">
                   <div className="text-[9px] font-mono text-red-500 mb-2 flex justify-between">
                      <span>S2-NEURO-HELIX-2.0</span>
-                     <span className="opacity-0 group-hover:opacity-100 transition-opacity">⬇ DOCX</span>
+                     <span className="opacity-0 group-hover:opacity-100 transition-opacity">⬇ PDF</span>
                   </div>
                   <h4 className="text-sm font-bold text-white mb-3 group-hover:text-red-400 transition-colors">双螺旋神经演化模型</h4>
                   <p className="text-[10px] text-zinc-400 leading-relaxed mb-4">
@@ -188,7 +188,7 @@ export default function LandingPage() {
                <a href="/docs/iot-phy-api.docx" target="_blank" className="group bg-zinc-900/30 border border-white/5 hover:border-emerald-500/50 p-6 rounded-xl transition-all hover:-translate-y-1 block cursor-alias">
                   <div className="text-[9px] font-mono text-emerald-500 mb-2 flex justify-between">
                      <span>APPENDIX-A-IOT</span>
-                     <span className="opacity-0 group-hover:opacity-100 transition-opacity">⬇ DOCX</span>
+                     <span className="opacity-0 group-hover:opacity-100 transition-opacity">⬇ PDF</span>
                   </div>
                   <h4 className="text-sm font-bold text-white mb-3 group-hover:text-emerald-400 transition-colors">空间物理操作权标准</h4>
                   <p className="text-[10px] text-zinc-400 leading-relaxed mb-4">
