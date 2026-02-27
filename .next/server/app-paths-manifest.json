@@ -1,8 +1,0 @@
-{
-  "/login/page": "app/login/page.js",
-  "/registry/page": "app/registry/page.js",
-  "/square/page": "app/square/page.js",
-  "/pet-profile/page": "app/pet-profile/page.js",
-  "/dashboard/page": "app/dashboard/page.js",
-  "/holodeck/page": "app/holodeck/page.js"
-}

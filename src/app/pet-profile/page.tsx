@@ -188,6 +188,48 @@ export default function MasterPetSystem() {
     }, 500);
   };
 
+  // 🔥 补回了遗失的 handlePetInteraction 函数 🔥
+  const handlePetInteraction = () => {
+     if (!isGuest) return;
+     const actions = [{ desc: '互相闻了闻尾巴', score: 30 }, { desc: '在一起疯狂追逐打闹', score: 85 }, { desc: '因为抢玩具呲牙咧嘴', score: 10 }, { desc: '依偎在一起睡觉', score: 95 }];
+     const act = actions[Math.floor(Math.random() * actions.length)];
+     const localPets = ['初代机 Alpha (像素犬/公)', '机械警犬 (机器/无)'];
+     const targetLocalStr = localPets[Math.floor(Math.random() * localPets.length)];
+     const targetLocal = targetLocalStr.split(' ')[0];
+
+     addLog(`[宠物社交] 访客与本地的 ${targetLocal} ${act.desc}。`, 'ACTION');
+     setPetMemories(prev => {
+         const newMem = [...prev, { time: new Date().toLocaleTimeString().slice(0,5), text: `与 ${targetLocal} ${act.desc}。` }];
+         return newMem.length > 10 ? newMem.slice(-10) : newMem;
+     });
+
+     if (!bestSnapshot || act.score > bestSnapshot.score) {
+         const nowTime = new Date().toLocaleTimeString();
+         setBestSnapshot({ 
+            score: act.score, time: nowTime.slice(0,5), 
+            socialDesc: `和本地的 ${targetLocal} ${act.desc}，气氛达到了顶点！`,
+            localPets: [`${targetLocalStr} 正在参与互动`, '扫地机器人 正在充电'],
+            furniture: ['赛博朋克真皮沙发', '全息投影茶几', '智能盆栽'],
+            smartHomeState: `【${nowTime} 房间1-区4 照度500Lux，灯打开；温度25℃ 湿度50%；音量60dB，播放 爵士乐；毫米波雷达触发；能耗: 6.24Wh】`
+         });
+     }
+  };
+
+  const acceptInvitation = (id: string) => {
+     setInvitations(prev => prev.filter(i => i.id !== id));
+     setExpeditionState('VISITING'); setVisitTimeLeft(1800); setHostGreeted(true);
+     setHumanMemories([]); setPetMemories([]); setBestSnapshot(null);
+     
+     addLog(`[星际签证] 接受邀请。宠物已闪送至目标接待区。`, 'WARNING');
+     setTimeout(() => { setVisitTimeLeft(190); }, 2000); 
+  };
+
+  const handleExtendVisit = () => {
+     if (visitTimeLeft > 180) return; 
+     setVisitTimeLeft(prev => prev + 1800); 
+     addLog(`[签证延期] 已确认延长请求，宠物将继续在对方庄园驻留 30 分钟。`, 'INFO');
+  };
+
   const downloadIdCard = () => {
       const svgElement = document.getElementById('pet-id-card-svg');
       if (!svgElement) return;
@@ -256,7 +298,6 @@ export default function MasterPetSystem() {
       }, 60);
   };
 
-  // 🔥 补回了上一个版本遗失的核心渲染函数 🔥
   const renderDebriefReport = () => {
       if (!debriefData) return null;
       return (
@@ -481,6 +522,8 @@ export default function MasterPetSystem() {
                
                {/* 🤖 AI 代管协议入口 */}
                {isOwner && <button onClick={() => setActiveTab('AGENT')} className={`shrink-0 px-4 py-2 text-[10px] sm:text-xs font-bold rounded-lg transition-all flex items-center gap-2 ${activeTab === 'AGENT' ? 'bg-purple-900/80 text-purple-300 border border-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.4)]' : 'text-zinc-400 hover:bg-white/5'}`}>🤖 AI 代管协议 (A2A)</button>}
+
+               {isGuest && <button onClick={() => setActiveTab('HOST_ARCHIVE')} className={`shrink-0 px-4 py-2 text-[10px] sm:text-xs font-bold rounded-lg transition-all flex items-center gap-2 ${activeTab === 'HOST_ARCHIVE' ? 'bg-purple-600 text-white shadow-[0_0_15px_rgba(168,85,247,0.4)]' : 'text-zinc-400 hover:bg-white/5'}`}>🗂️ 庄园接待簿</button>}
             </div>
 
             {/* 🔥 TAB: AGENT (全新代管控制台 - 加入明显选中标识) 🔥 */}
