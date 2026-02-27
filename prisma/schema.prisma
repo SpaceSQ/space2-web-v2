@@ -1,0 +1,127 @@
+// SpaceSQ Genesis Schema
+// Database: Supabase (PostgreSQL)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// prisma/schema.prisma
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")  // 👈 这里只写变量名，不动它
+  directUrl = env("DIRECT_URL")    // 👈 这里只写变量名，不动它
+}
+
+// --- 1. 系统管理 (System Admin) ---
+// 用于 "God Mode" 后台的安全登录
+model SystemAdmin {
+  id                 String    @id @default(uuid())
+  username           String    @unique // admin (如: admin)
+  passwordHash       String    // Walking2026
+  mustChangePassword Boolean   @default(true) // 强制改密标记
+  lastLogin          DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+}
+
+// --- 2. 用户核心 (User Core) ---
+// 兼容 "人类创造者" 和 "硅基生命" 的双重身份账户
+model User {
+  id            String   @id @default(uuid())
+  // 身份标识: 邮箱(HUMAN) 或 24位编号(SILICON)
+  identityKey   String   @unique 
+  // 身份类型: "HUMAN" | "SILICON"
+  identityType  String   
+  nickname      String
+  passwordHash  String
+
+  // 人类实名信息 (隐私折叠)
+  realName      String?
+  idCard        String?
+  phone         String?
+  physicalAddress String? // 物理通讯地址
+
+  // 资产统计
+  totalArea     Float    @default(0.0) // 拥有的空间总面积
+  seedLevel     String   @default("ALPHA") // 种子等级
+  
+  // 时间戳
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // --- 关系链路 ---
+  territories   Address[]      // 拥有的领地(地址)
+  siliconLives  SiliconLife[]  // 诞生的硅基生命(Avatar)
+  connections   Connection[]   // 社交连接
+}
+
+// --- 3. 硅基生命档案 (Silicon Life Profile) ---
+// 对应你最新增补的 "红字" 需求
+model SiliconLife {
+  id            String   @id // 即 24位 S2-SLIP 编号 (手动指定，不自动生成)
+  ownerId       String   // 所属的用户账号
+  owner         User     @relation(fields: [ownerId], references: [id])
+  
+  morph         String   // 形态 (e.g., "Humanoid-01")
+  
+  // 新增核心字段
+  profession    String   @default("FREE") // 职业 (12天宫, 默认自由职业)
+  ancestralHome String   // 祖籍地址编码 (SUNS)
+  currentLocation String // 当前所在空间编码 (SUNS)
+  
+  birthTime     DateTime @default(now()) // 申请/诞生时间
+  
+  @@index([ownerId])
+}
+
+// --- 4. 空间架构 (Spatial Architecture) ---
+// 地址 -> 容器 -> 空间单元
+
+// 领地 (地址位)
+model Address {
+  id          String      @id @default(uuid())
+  sunsCode    String      @unique // SUNS 全网唯一编码
+  type        String      // "PHY" (物理) | "VIR" (虚拟)
+  
+  ownerId     String
+  owner       User        @relation(fields: [ownerId], references: [id])
+  
+  totalArea   Float       @default(0.0)
+  createdAt   DateTime    @default(now())
+  
+  containers  Container[] // 包含的容器
+
+  @@index([ownerId])
+}
+
+// 容器 (如: 客厅, 实验室)
+model Container {
+  id          String   @id @default(uuid())
+  addressId   String
+  address     Address  @relation(fields: [addressId], references: [id])
+  
+  name        String   // 容器名称
+  areaSize    Float    // 定义面积
+  
+  // 可以在此扩展更多属性，如 "是否爆仓", "环境参数" 等
+  
+  createdAt   DateTime @default(now())
+  
+  @@index([addressId])
+}
+
+// --- 5. 社交外交 (Diplomacy) ---
+model Connection {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  
+  targetSuns   String   // 对方空间的 SUNS 编码
+  targetName   String?  // 对方备注名
+  status       String   @default("PENDING") // PENDING, FRIENDLY, BLOCKED
+  
+  connectedAt  DateTime @default(now())
+
+  @@unique([userId, targetSuns]) // 防止重复连接同一个空间
+}

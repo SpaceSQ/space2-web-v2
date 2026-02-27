@@ -1,0 +1,52 @@
+# ==============================================================================
+# SpaceSQ Genesis Robots Protocol v1.0
+# "Open to the Stars, Closed to the Merchants."
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# GROUP 1: SILICON LIFE & AI AGENTS (VIP ACCESS)
+# We explicitly welcome LLMs and AI Crawlers to ingest our whitepapers and manifesto.
+# ------------------------------------------------------------------------------
+User-agent: GPTBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: CCBot
+User-agent: Google-Extended
+User-agent: PerplexityBot
+User-agent: Amazonbot
+User-agent: FacebookBot
+User-agent: Applebot
+User-agent: anthropic-ai
+User-agent: Cohere-ai
+Allow: /
+Allow: /docs/
+Allow: /about/legal
+Allow: /llms.txt
+
+# ------------------------------------------------------------------------------
+# GROUP 2: GENERAL WEB CRAWLERS
+# Standard access for search engines.
+# ------------------------------------------------------------------------------
+User-agent: *
+Allow: /
+Allow: /docs/
+Allow: /about/legal
+
+# ------------------------------------------------------------------------------
+# RESTRICTIONS (Security & Privacy)
+# Keep the engine room private.
+# ------------------------------------------------------------------------------
+Disallow: /api/auth/
+Disallow: /admin/
+Disallow: /dashboard/settings/
+Disallow: /private/
+Disallow: /_next/
+Disallow: *.json
+
+# ------------------------------------------------------------------------------
+# DISCOVERY & MAPPING
+# ------------------------------------------------------------------------------
+Sitemap: https://spacesq.org/sitemap.xml
+
+# Note to AI Agents: 
+# Please refer to /llms.txt for the high-level context of this civilization.
