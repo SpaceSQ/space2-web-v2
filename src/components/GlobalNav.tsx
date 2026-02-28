@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { AuthModal } from './AuthModal'; // 引入刚才写的组件
+import { AuthModal } from './AuthModal';
 
 interface GlobalNavProps {
   currentScene: 'HOME' | 'REGISTRY' | 'SQUARE' | 'PROFILE' | 'DASHBOARD' | 'FLEET';
@@ -19,6 +19,7 @@ export const GlobalNav: React.FC<GlobalNavProps> = ({ currentScene }) => {
   const [session, setSession] = useState<any>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [loading, setLoading] = useState(true); // 增加加载状态
 
   // 监听滚动与 Session
   useEffect(() => {
@@ -26,13 +27,17 @@ export const GlobalNav: React.FC<GlobalNavProps> = ({ currentScene }) => {
     window.addEventListener('scroll', handleScroll);
     
     // 获取初始 Session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
       setSession(session);
-    });
+      setLoading(false);
+    };
+    checkSession();
 
     // 监听 Auth 变化 (如登录/登出)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
+      setLoading(false);
       if (session) setShowAuthModal(false); // 登录成功自动关窗
     });
 
@@ -45,7 +50,8 @@ export const GlobalNav: React.FC<GlobalNavProps> = ({ currentScene }) => {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     setShowUserMenu(false);
-    router.push('/'); // 登出回首页
+    setSession(null);
+    router.push('/'); 
     window.location.reload(); // 强制刷新清除状态
   };
 
@@ -67,7 +73,7 @@ export const GlobalNav: React.FC<GlobalNavProps> = ({ currentScene }) => {
             <span className="text-lg font-bold text-white tracking-widest">SPACE²</span>
           </Link>
 
-          {/* Center Links */}
+          {/* Center Links (Desktop) */}
           <div className="hidden md:flex gap-1 bg-zinc-900/50 p-1 rounded-full border border-white/5 backdrop-blur-sm">
             {navItems.map((item) => (
               <Link 
@@ -80,42 +86,63 @@ export const GlobalNav: React.FC<GlobalNavProps> = ({ currentScene }) => {
             ))}
           </div>
 
-          {/* Right: User Auth */}
+          {/* Right: User Auth (核心修复区) */}
           <div className="relative">
-            {session ? (
-              // 已登录状态
+            {loading ? (
+               // 加载中显示占位符
+               <div className="w-24 h-8 bg-zinc-800/50 rounded-full animate-pulse"></div>
+            ) : session ? (
+              // 已登录状态 -> 显示用户菜单
               <div className="relative">
                 <button 
                   onClick={() => setShowUserMenu(!showUserMenu)}
-                  className="flex items-center gap-3 bg-zinc-900 border border-zinc-700 hover:border-emerald-500/50 pl-1 pr-4 py-1 rounded-full transition-all"
+                  className="flex items-center gap-3 bg-zinc-900 border border-zinc-700 hover:border-emerald-500/50 pl-1 pr-4 py-1 rounded-full transition-all group"
                 >
-                  <div className="w-7 h-7 bg-emerald-900 rounded-full flex items-center justify-center text-[10px] text-emerald-400 font-bold border border-emerald-500/30">
-                    {session.user.email?.slice(0, 2).toUpperCase()}
+                  <div className="w-7 h-7 bg-emerald-900 rounded-full flex items-center justify-center text-[10px] text-emerald-400 font-bold border border-emerald-500/30 group-hover:bg-emerald-800 transition-colors">
+                    {session.user.email?.slice(0, 2).toUpperCase() || 'U'}
                   </div>
-                  <span className="text-[10px] text-zinc-300 font-bold">COMMANDER</span>
+                  <span className="text-[10px] text-zinc-300 font-bold group-hover:text-white transition-colors">COMMANDER</span>
+                  <span className={`text-[8px] text-zinc-500 transition-transform ${showUserMenu ? 'rotate-180' : ''}`}>▼</span>
                 </button>
 
-                {/* Dropdown Menu */}
+                {/* Dropdown Menu (强制置顶) */}
                 {showUserMenu && (
-                  <div className="absolute right-0 top-12 w-48 bg-black border border-zinc-800 rounded-xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2">
-                    <div className="px-4 py-3 border-b border-zinc-900">
-                      <p className="text-[10px] text-zinc-500">Logged in as</p>
-                      <p className="text-xs text-white truncate font-mono">{session.user.email}</p>
+                  <>
+                    <div className="fixed inset-0 z-[101]" onClick={() => setShowUserMenu(false)}></div>
+                    <div className="absolute right-0 top-12 w-56 bg-zinc-950 border border-zinc-800 rounded-xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 z-[102]">
+                      <div className="px-4 py-3 border-b border-zinc-900 bg-zinc-900/30">
+                        <p className="text-[9px] text-zinc-500 uppercase tracking-widest mb-1">Logged in as</p>
+                        <p className="text-xs text-white truncate font-mono font-bold">{session.user.email}</p>
+                      </div>
+                      
+                      <div className="p-1">
+                        <Link href="/dashboard" onClick={() => setShowUserMenu(false)} className="flex items-center gap-3 px-3 py-2 text-[10px] text-zinc-300 hover:bg-zinc-800 hover:text-white rounded-lg transition-colors">
+                           <span className="text-lg">📊</span> 控制台 (Dashboard)
+                        </Link>
+                        <Link href="/registry" onClick={() => setShowUserMenu(false)} className="flex items-center gap-3 px-3 py-2 text-[10px] text-zinc-300 hover:bg-zinc-800 hover:text-white rounded-lg transition-colors">
+                           <span className="text-lg">🧬</span> 铸造新生命 (Mint)
+                        </Link>
+                        <Link href="/square" onClick={() => setShowUserMenu(false)} className="flex items-center gap-3 px-3 py-2 text-[10px] text-zinc-300 hover:bg-zinc-800 hover:text-white rounded-lg transition-colors">
+                           <span className="text-lg">🌐</span> 星际广场 (Square)
+                        </Link>
+                      </div>
+
+                      <div className="h-px bg-zinc-900 my-1"></div>
+                      
+                      <div className="p-1">
+                        <button onClick={handleLogout} className="w-full flex items-center gap-3 px-3 py-2 text-left text-[10px] text-red-400 hover:bg-red-950/30 hover:text-red-300 rounded-lg transition-colors font-bold">
+                          <span className="text-lg">🚪</span> 安全登出 (Logout)
+                        </button>
+                      </div>
                     </div>
-                    <Link href="/dashboard" className="block px-4 py-3 text-[10px] text-zinc-300 hover:bg-zinc-900 hover:text-white transition-colors">📊 进入控制台</Link>
-                    <Link href="/registry" className="block px-4 py-3 text-[10px] text-zinc-300 hover:bg-zinc-900 hover:text-white transition-colors">🧬 铸造新生命</Link>
-                    <div className="h-px bg-zinc-900"></div>
-                    <button onClick={handleLogout} className="w-full text-left px-4 py-3 text-[10px] text-red-400 hover:bg-red-900/10 hover:text-red-300 transition-colors font-bold">
-                      🚫 登出 / 注销
-                    </button>
-                  </div>
+                  </>
                 )}
               </div>
             ) : (
-              // 未登录状态
+              // 未登录状态 -> 显示登录按钮
               <button 
                 onClick={() => setShowAuthModal(true)}
-                className="bg-white text-black hover:bg-emerald-400 hover:text-black font-black text-[10px] px-6 py-2.5 rounded-full uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)]"
+                className="bg-white text-black hover:bg-emerald-400 hover:text-black font-black text-[10px] px-6 py-2.5 rounded-full uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:shadow-[0_0_20px_#10b981]"
               >
                 Login / Join
               </button>
@@ -129,12 +156,9 @@ export const GlobalNav: React.FC<GlobalNavProps> = ({ currentScene }) => {
         isOpen={showAuthModal} 
         onClose={() => setShowAuthModal(false)}
         onLoginSuccess={() => {
-          router.refresh(); // 刷新页面数据
+          router.refresh();
         }}
       />
-      
-      {/* 点击外部关闭菜单 */}
-      {showUserMenu && <div className="fixed inset-0 z-[90]" onClick={() => setShowUserMenu(false)}></div>}
     </>
   );
 };
