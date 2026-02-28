@@ -52,130 +52,139 @@ export const GlobalNav: React.FC<GlobalNavProps> = ({ currentScene }) => {
   };
 
   const navItems = [
-    { name: '首页', path: '/', id: 'HOME' },
-    { name: '控制台', path: '/dashboard', id: 'DASHBOARD' },
-    { name: '注册局', path: '/registry', id: 'REGISTRY' },
-    { name: '广场', path: '/square', id: 'SQUARE' },
+    { name: '首页', en: 'HOME', path: '/', id: 'HOME' },
+    { name: '控制台', en: 'DASH', path: '/dashboard', id: 'DASHBOARD' },
+    { name: '注册局', en: 'MINT', path: '/registry', id: 'REGISTRY' },
+    { name: '广场', en: 'SQUARE', path: '/square', id: 'SQUARE' },
   ];
 
   return (
     <>
-      <nav className={`fixed top-0 left-0 w-full z-[100] transition-all duration-300 border-b ${isScrolled ? 'bg-black/90 border-zinc-800 py-3 backdrop-blur-md' : 'bg-gradient-to-b from-black/80 to-transparent border-transparent py-6'}`}>
-        <div className="max-w-[1400px] mx-auto px-6 flex justify-between items-center">
+      <nav className={`fixed top-0 left-0 w-full z-[100] transition-all duration-300 border-b ${isScrolled ? 'bg-[#050505]/90 border-zinc-800 py-2 backdrop-blur-xl' : 'bg-gradient-to-b from-black/90 to-transparent border-transparent py-4'}`}>
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 flex justify-between items-center h-14">
           
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="relative">
-               <div className="w-8 h-8 bg-white text-black rounded flex items-center justify-center font-black text-xs relative z-10 group-hover:bg-emerald-400 transition-colors">S²</div>
-               <div className="absolute top-0 left-0 w-8 h-8 bg-white/30 blur-md animate-pulse"></div>
+          {/* Logo 区 */}
+          <Link href="/" className="flex items-center gap-3 group no-underline">
+            <div className="relative w-9 h-9 flex items-center justify-center bg-zinc-900 border border-zinc-700 rounded-lg group-hover:border-emerald-500/50 transition-colors shadow-lg">
+               <span className="text-white font-black text-xs">S²</span>
+               <div className="absolute -bottom-1 -right-1 w-2 h-2 bg-emerald-500 rounded-full animate-pulse border border-black"></div>
             </div>
             <div className="flex flex-col">
                <span className="text-sm font-black text-white tracking-[0.2em] leading-none group-hover:text-emerald-400 transition-colors">SPACE²</span>
-               <span className="text-[8px] text-zinc-500 font-mono tracking-widest hidden sm:block">PROTOCOL v2.0</span>
+               <span className="text-[8px] text-zinc-500 font-mono tracking-widest hidden sm:block mt-0.5">OPERATING SYSTEM</span>
             </div>
           </Link>
 
-          {/* Desktop Nav */}
-          <div className="hidden md:flex items-center bg-black/40 border border-white/10 rounded-full p-1 backdrop-blur-md gap-1">
+          {/* 中间导航 - 胶囊按钮组 */}
+          <div className="hidden md:flex items-center gap-2">
             {navItems.map((item) => (
               <Link 
                 key={item.id} 
                 href={item.path}
-                className={`px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-2
+                className={`group relative px-5 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all border no-underline flex flex-col items-center justify-center min-w-[80px]
                   ${pathname === item.path 
-                    ? 'bg-zinc-800 text-white shadow-lg border border-zinc-600' 
-                    : 'text-zinc-400 hover:text-white hover:bg-white/10 border border-transparent'
+                    ? 'bg-zinc-800 border-zinc-600 text-white shadow-[0_2px_10px_rgba(0,0,0,0.5)]' 
+                    : 'bg-transparent border-transparent text-zinc-500 hover:bg-zinc-900/50 hover:text-zinc-300 hover:border-zinc-800'
                   }`}
               >
-                {item.name}
+                <span className="leading-none mb-0.5">{item.name}</span>
+                <span className={`text-[7px] font-mono leading-none ${pathname === item.path ? 'text-emerald-500' : 'text-zinc-600 group-hover:text-zinc-500'}`}>{item.en}</span>
+                
+                {/* 选中时的底部光条 */}
+                {pathname === item.path && <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1/2 h-[2px] bg-emerald-500 shadow-[0_0_5px_#10b981]"></div>}
               </Link>
             ))}
           </div>
 
-          {/* Right: User HUD */}
+          {/* 右侧：用户 HUD 面板 */}
           <div className="relative">
             {loading ? (
-               <div className="w-24 h-9 bg-zinc-800/50 rounded animate-pulse"></div>
+               <div className="w-32 h-10 bg-zinc-900/50 rounded-lg border border-zinc-800 animate-pulse"></div>
             ) : session ? (
-              // === 已登录 (Command Center) ===
-              <div className="relative group">
+              // === 已登录 (身份卡) ===
+              <div className="relative">
                 <button 
                   onClick={() => setShowUserMenu(!showUserMenu)}
-                  className={`flex items-center gap-3 pl-1 pr-4 py-1.5 rounded-full transition-all border border-zinc-800 bg-zinc-950 hover:border-emerald-500/50 ${showUserMenu ? 'border-emerald-500 ring-1 ring-emerald-500/50' : ''}`}
+                  className={`flex items-center gap-3 pl-2 pr-4 py-1.5 h-10 rounded-lg transition-all border bg-[#0a0a0a] shadow-lg group
+                    ${showUserMenu 
+                      ? 'border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.1)]' 
+                      : 'border-zinc-800 hover:border-zinc-600'}`}
                 >
-                  <div className="w-8 h-8 rounded-full bg-emerald-950 flex items-center justify-center border border-emerald-500/30">
-                    <span className="text-xs font-black text-emerald-400">{session.user.email?.slice(0, 1).toUpperCase()}</span>
+                  {/* 头像区 */}
+                  <div className="relative w-6 h-6 rounded bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-300 border border-zinc-700">
+                    {session.user.email?.slice(0, 1).toUpperCase()}
+                    {/* 在线状态点 */}
+                    <div className="absolute -top-1 -right-1 w-2 h-2 bg-emerald-500 rounded-full border border-black shadow-[0_0_5px_#10b981]"></div>
                   </div>
+                  
+                  {/* 文字区 */}
                   <div className="flex flex-col items-start mr-2">
-                     <span className="text-[9px] text-zinc-400 font-bold uppercase leading-none mb-0.5">Commander</span>
-                     <span className="text-[10px] text-white font-mono leading-none w-20 truncate text-left">{session.user.email?.split('@')[0]}</span>
+                     <span className="text-[9px] text-emerald-500 font-bold uppercase leading-none mb-0.5 tracking-wider">Connected</span>
+                     <span className="text-[10px] text-zinc-300 font-mono leading-none w-20 truncate text-left group-hover:text-white transition-colors">COMMANDER</span>
                   </div>
-                  <span className={`text-[8px] text-zinc-600 transition-transform duration-300 ${showUserMenu ? 'rotate-180 text-emerald-500' : ''}`}>▼</span>
+
+                  {/* 箭头 */}
+                  <div className={`w-0 h-0 border-l-[3px] border-l-transparent border-r-[3px] border-r-transparent border-t-[4px] border-t-zinc-500 transition-transform ${showUserMenu ? 'rotate-180 border-t-emerald-500' : ''}`}></div>
                 </button>
 
-                {/* === 下拉菜单面板 (HUD Panel) === */}
+                {/* === 指令面板 (HUD Menu) === */}
                 {showUserMenu && (
                   <>
                     <div className="fixed inset-0 z-[101]" onClick={() => setShowUserMenu(false)}></div>
-                    <div className="absolute right-0 top-14 w-72 bg-[#050505] border border-zinc-800 rounded-xl shadow-[0_20px_60px_rgba(0,0,0,0.9)] overflow-hidden animate-in fade-in slide-in-from-top-4 z-[102] flex flex-col">
+                    <div className="absolute right-0 top-12 w-64 bg-[#080808] border border-zinc-700 rounded-xl shadow-[0_20px_80px_rgba(0,0,0,1)] overflow-hidden animate-in fade-in slide-in-from-top-2 z-[102] flex flex-col p-1.5 gap-1.5">
                       
-                      {/* 1. 头部身份卡 */}
-                      <div className="p-4 border-b border-zinc-900 bg-zinc-900/20 relative overflow-hidden">
-                        <div className="absolute top-0 right-0 p-2 opacity-20"><div className="w-16 h-16 bg-emerald-500 blur-2xl rounded-full"></div></div>
-                        <p className="text-[9px] text-emerald-600 font-bold uppercase tracking-widest mb-1">Active Session</p>
-                        <p className="text-xs text-white font-mono break-all">{session.user.email}</p>
+                      {/* 1. 顶部 Session 信息 */}
+                      <div className="bg-zinc-900/40 border border-zinc-800 rounded-lg p-3 mb-1">
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="text-[8px] text-zinc-500 uppercase tracking-widest">Signal Source</span>
+                          <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
+                        </div>
+                        <p className="text-[10px] text-zinc-300 font-mono break-all">{session.user.email}</p>
                       </div>
                       
-                      {/* 2. 功能菜单网格 */}
-                      <div className="p-2 grid grid-cols-1 gap-1 bg-black">
-                        
-                        <Link href="/dashboard" onClick={() => setShowUserMenu(false)} className="group flex items-center gap-4 p-3 rounded-lg hover:bg-zinc-900 transition-all border border-transparent hover:border-zinc-800">
-                           <div className="w-10 h-10 bg-blue-950/30 rounded flex items-center justify-center text-xl group-hover:scale-110 transition-transform">📊</div>
-                           <div className="flex flex-col">
-                              <span className="text-xs font-bold text-zinc-300 group-hover:text-blue-400 transition-colors">控制台 (Dashboard)</span>
-                              <span className="text-[9px] text-zinc-600 group-hover:text-zinc-500">查看宠物状态与资产</span>
+                      {/* 2. 核心操作按钮 (Block Buttons) */}
+                      <Link href="/dashboard" onClick={() => setShowUserMenu(false)} className="no-underline group flex items-center justify-between p-3 bg-zinc-900/20 hover:bg-zinc-800 border border-zinc-800/50 hover:border-zinc-600 rounded-lg transition-all">
+                           <div className="flex items-center gap-3">
+                              <span className="text-lg grayscale group-hover:grayscale-0 transition-all">📊</span>
+                              <div className="flex flex-col">
+                                <span className="text-[10px] font-bold text-zinc-300 group-hover:text-white uppercase tracking-wider">Dashboard</span>
+                                <span className="text-[8px] text-zinc-600 group-hover:text-zinc-400">控制台</span>
+                              </div>
                            </div>
-                        </Link>
-                        
-                        <Link href="/registry" onClick={() => setShowUserMenu(false)} className="group flex items-center gap-4 p-3 rounded-lg hover:bg-zinc-900 transition-all border border-transparent hover:border-zinc-800">
-                           <div className="w-10 h-10 bg-emerald-950/30 rounded flex items-center justify-center text-xl group-hover:scale-110 transition-transform">🧬</div>
-                           <div className="flex flex-col">
-                              <span className="text-xs font-bold text-zinc-300 group-hover:text-emerald-400 transition-colors">注册局 (Registry)</span>
-                              <span className="text-[9px] text-zinc-600 group-hover:text-zinc-500">铸造新的数字生命</span>
+                           <span className="text-[10px] text-zinc-700 group-hover:text-white">→</span>
+                      </Link>
+                      
+                      <Link href="/registry" onClick={() => setShowUserMenu(false)} className="no-underline group flex items-center justify-between p-3 bg-zinc-900/20 hover:bg-zinc-800 border border-zinc-800/50 hover:border-zinc-600 rounded-lg transition-all">
+                           <div className="flex items-center gap-3">
+                              <span className="text-lg grayscale group-hover:grayscale-0 transition-all">🧬</span>
+                              <div className="flex flex-col">
+                                <span className="text-[10px] font-bold text-zinc-300 group-hover:text-white uppercase tracking-wider">Mint New Life</span>
+                                <span className="text-[8px] text-zinc-600 group-hover:text-zinc-400">注册局</span>
+                              </div>
                            </div>
-                        </Link>
-
-                         <Link href="/square" onClick={() => setShowUserMenu(false)} className="group flex items-center gap-4 p-3 rounded-lg hover:bg-zinc-900 transition-all border border-transparent hover:border-zinc-800">
-                           <div className="w-10 h-10 bg-purple-950/30 rounded flex items-center justify-center text-xl group-hover:scale-110 transition-transform">🌐</div>
-                           <div className="flex flex-col">
-                              <span className="text-xs font-bold text-zinc-300 group-hover:text-purple-400 transition-colors">星际广场 (Square)</span>
-                              <span className="text-[9px] text-zinc-600 group-hover:text-zinc-500">访问公共区域</span>
-                           </div>
-                        </Link>
-                      </div>
+                           <span className="text-[10px] text-zinc-700 group-hover:text-white">→</span>
+                      </Link>
 
                       {/* 3. 底部危险区 */}
-                      <div className="p-2 border-t border-zinc-900 bg-zinc-950">
-                        <button onClick={handleLogout} className="w-full flex items-center justify-center gap-2 p-3 rounded-lg bg-red-950/10 hover:bg-red-900/20 text-red-500/70 hover:text-red-400 transition-all font-bold text-[10px] uppercase tracking-widest border border-transparent hover:border-red-900/30">
-                          <span>⚠️ Disconnect / Logout</span>
-                        </button>
-                      </div>
-
+                      <div className="h-px bg-zinc-900 my-1"></div>
+                      
+                      <button onClick={handleLogout} className="w-full flex items-center justify-center gap-2 p-3 bg-red-950/10 hover:bg-red-900/30 border border-red-900/20 hover:border-red-800 rounded-lg text-red-500/80 hover:text-red-400 transition-all group">
+                         <span className="text-[10px] font-bold uppercase tracking-widest">🛑 Terminate Session</span>
+                      </button>
                     </div>
                   </>
                 )}
               </div>
             ) : (
-              // === 未登录 (Neon Button) ===
+              // === 未登录 (高亮胶囊按钮) ===
               <button 
                 onClick={() => setShowAuthModal(true)}
-                className="group relative px-6 py-2 bg-white text-black font-black text-[10px] uppercase tracking-[0.2em] rounded hover:scale-105 transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)] overflow-hidden"
+                className="group relative h-10 px-6 bg-white hover:bg-emerald-400 rounded-lg shadow-[0_0_20px_rgba(255,255,255,0.15)] hover:shadow-[0_0_25px_#10b981] transition-all duration-300 overflow-hidden flex items-center justify-center border border-transparent"
               >
-                <div className="absolute inset-0 bg-emerald-400 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
-                <span className="relative z-10 flex items-center gap-2">
-                   <span>Initialize</span>
-                   <span className="bg-black text-white px-1.5 py-0.5 rounded text-[8px] group-hover:bg-white group-hover:text-black transition-colors">LOGIN</span>
-                </span>
+                <div className="flex flex-col items-center leading-none">
+                  <span className="text-[10px] font-black text-black uppercase tracking-[0.2em] group-hover:tracking-[0.3em] transition-all">Initialize</span>
+                  <span className="text-[8px] font-bold text-zinc-500 group-hover:text-black/70 mt-0.5">LOGIN / JOIN</span>
+                </div>
               </button>
             )}
           </div>
