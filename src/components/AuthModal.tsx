@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
-// 定义模态框的几种状态
 type AuthView = 'LOGIN' | 'REGISTER' | 'VERIFY_EMAIL' | 'FORGOT_PASSWORD' | 'UPDATE_PASSWORD';
 
 interface AuthModalProps {
@@ -16,20 +15,19 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
   const [view, setView] = useState<AuthView>('LOGIN');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [code, setCode] = useState(''); // 六位验证码
+  const [code, setCode] = useState(''); 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'error' | 'success'; text: string } | null>(null);
 
-  // 清理状态
   useEffect(() => {
     if (isOpen) {
       setMessage(null);
       setView('LOGIN');
       setLoading(false);
+      setCode(''); // 每次打开清空验证码
     }
   }, [isOpen]);
 
-  // 1. 登录逻辑
   const handleLogin = async () => {
     setLoading(true); setMessage(null);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -42,14 +40,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
     }
   };
 
-  // 2. 注册逻辑 (发送验证码)
   const handleRegister = async () => {
     setLoading(true); setMessage(null);
-    // 注意：这里使用 signUp，Supabase 设置需开启 "Confirm Email"
     const { error } = await supabase.auth.signUp({ 
       email, 
       password,
-      options: { emailRedirectTo: `${window.location.origin}/auth/callback` } // 即使是发码，也需配置
+      options: { emailRedirectTo: `${window.location.origin}/auth/callback` }
     });
     
     if (error) {
@@ -57,12 +53,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
       setLoading(false);
     } else {
       setMessage({ type: 'success', text: '验证码已发送至您的邮箱，请查收！' });
-      setView('VERIFY_EMAIL'); // 跳转到输入验证码界面
+      setView('VERIFY_EMAIL'); 
       setLoading(false);
     }
   };
 
-  // 3. 验证邮箱注册的六位验证码
   const handleVerifyEmail = async () => {
     setLoading(true); setMessage(null);
     const { error } = await supabase.auth.verifyOtp({
@@ -72,17 +67,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
     });
 
     if (error) {
-      setMessage({ type: 'error', text: '验证码错误或已过期' });
+      setMessage({ type: 'error', text: '验证码无效或已过期' });
       setLoading(false);
     } else {
       setMessage({ type: 'success', text: '注册成功！正在登录...' });
-      // 验证成功后自动登录，或跳转
       onLoginSuccess();
       onClose();
     }
   };
 
-  // 4. 忘记密码 - 发送重置验证码
   const handleForgotPassword = async () => {
     setLoading(true); setMessage(null);
     const { error } = await supabase.auth.resetPasswordForEmail(email);
@@ -92,15 +85,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
       setLoading(false);
     } else {
       setMessage({ type: 'success', text: '重置代码已发送至邮箱。' });
-      setView('UPDATE_PASSWORD'); // 跳转到重置输入
+      setView('UPDATE_PASSWORD'); 
       setLoading(false);
     }
   };
 
-  // 5. 提交重置密码 (验证码 + 新密码)
   const handleUpdatePassword = async () => {
     setLoading(true); setMessage(null);
-    // 先验证 OTP (Recovery 类型)
     const { error: verifyError } = await supabase.auth.verifyOtp({
       email,
       token: code,
@@ -113,7 +104,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
       return;
     }
 
-    // 验证通过后更新密码
     const { error: updateError } = await supabase.auth.updateUser({ password: password });
     
     if (updateError) {
@@ -149,7 +139,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
 
         <div className="flex flex-col gap-4">
           
-          {/* 通用：邮箱输入 */}
           {view !== 'UPDATE_PASSWORD' && (
              <div className="flex flex-col gap-1">
                <label className="text-[10px] text-zinc-500 font-bold uppercase">Email</label>
@@ -157,29 +146,28 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
                  type="email" 
                  value={email} 
                  onChange={(e) => setEmail(e.target.value)}
-                 disabled={view === 'VERIFY_EMAIL'} // 验证时锁定邮箱
+                 disabled={view === 'VERIFY_EMAIL'} 
                  className="bg-black border border-zinc-700 p-3 rounded text-white text-xs focus:border-blue-500 outline-none"
                  placeholder="name@example.com"
                />
              </div>
           )}
 
-          {/* 验证码输入框 (仅在验证阶段显示) */}
+          {/* 👇👇👇 这里修复了 8 位验证码的问题 👇👇👇 */}
           {(view === 'VERIFY_EMAIL' || view === 'UPDATE_PASSWORD') && (
              <div className="flex flex-col gap-1">
-               <label className="text-[10px] text-yellow-500 font-bold uppercase">6-Digit Code (验证码)</label>
+               <label className="text-[10px] text-yellow-500 font-bold uppercase">Security Code (验证码)</label>
                <input 
                  type="text" 
                  value={code} 
                  onChange={(e) => setCode(e.target.value)}
-                 className="bg-black border border-yellow-700/50 p-3 rounded text-yellow-400 text-center text-lg tracking-[0.5em] font-mono focus:border-yellow-500 outline-none"
-                 placeholder="------"
-                 maxLength={6}
+                 className="bg-black border border-yellow-700/50 p-3 rounded text-yellow-400 text-center text-lg tracking-[0.3em] font-mono focus:border-yellow-500 outline-none"
+                 placeholder="INPUT CODE"
+                 maxLength={10} // 放宽到 10 位，兼容 6 位或 8 位
                />
              </div>
           )}
 
-          {/* 密码输入 (注册、登录、重置时显示) */}
           {(view === 'LOGIN' || view === 'REGISTER' || view === 'UPDATE_PASSWORD') && (
              <div className="flex flex-col gap-1">
                <label className="text-[10px] text-zinc-500 font-bold uppercase">
@@ -194,7 +182,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
              </div>
           )}
 
-          {/* 核心操作按钮 */}
           <button 
             onClick={() => {
               if (view === 'LOGIN') handleLogin();
@@ -209,7 +196,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
             {loading ? 'PROCESSING...' : 'EXECUTE'}
           </button>
 
-          {/* 底部切换链接 */}
           <div className="flex justify-between mt-2 text-[10px] text-zinc-500 font-mono">
             {view === 'LOGIN' && (
               <>
