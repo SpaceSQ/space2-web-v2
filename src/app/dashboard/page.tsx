@@ -1,157 +1,110 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { useRouter } from 'next/navigation';
 
-// 定义宠物数据结构
-interface Pet {
-  id: string;
-  name: string;
-  status: string;
-  dna_hash?: string;
-  created_at: string;
-}
-
-export default function DashboardPage() {
+export default function DbScanner() {
   const supabase = createClientComponentClient();
-  const router = useRouter();
-  const [pets, setPets] = useState<Pet[]>([]);
+  const [logs, setLogs] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<any>(null);
+
+  // 日志辅助函数
+  const log = (msg: string, type: 'info' | 'success' | 'error' | 'warn' = 'info') => {
+    const icon = { info: '🔹', success: '✅', error: '❌', warn: '⚠️' };
+    setLogs(prev => [...prev, `${icon[type]} [${new Date().toLocaleTimeString()}] ${msg}`]);
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      // 1. 检查用户是否登录
-      const { data: { session } } = await supabase.auth.getSession();
+    const scan = async () => {
+      log("正在初始化 Space² 数据库结构扫描...", 'info');
       
+      // 1. 检查连接与权限
+      const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        // 没登录直接踢回首页
-        router.push('/');
+        log("未检测到登录用户，请先登录！RLS 策略可能会阻止读取。", 'error');
+        setLoading(false);
         return;
       }
-      
-      setUser(session.user);
+      log(`用户已认证: ${session.user.email} (ID: ${session.user.id.slice(0,6)}...)`, 'success');
 
-      // 2. 拉取该用户的宠物列表
-      const { data, error } = await supabase
-        .from('pets')
-        .select('*')
-        .eq('owner_id', session.user.id)
-        .order('created_at', { ascending: false });
+      // ---------------------------------------------------------
+      // 2. 扫描：宠物/实体表 (核心)
+      // ---------------------------------------------------------
+      // 我们尝试几种常见的命名，看看哪个能中
+      const potentialPetTables = ['pets', 'pet_assets', 'entities', 'silicon_life', 'avatars'];
+      let foundPetTable = false;
 
-      if (data) setPets(data);
+      for (const table of potentialPetTables) {
+        const { data, error } = await supabase.from(table).select('*').limit(1);
+        
+        if (!error) {
+          foundPetTable = true;
+          log(`发现核心表: [${table}]`, 'success');
+          if (data && data.length > 0) {
+            log(`  👉 字段列表: ${Object.keys(data[0]).join(', ')}`, 'info');
+            log(`  👉 数据样本: ${JSON.stringify(data[0])}`, 'info');
+          } else {
+            log(`  ⚠️ 表 [${table}] 存在，但是是空的 (No rows).`, 'warn');
+            // 尝试插入一条假数据看看字段结构? (可选，暂时不做以免污染)
+          }
+        }
+      }
+      if (!foundPetTable) log("❌ 未找到任何疑似'宠物/实体'的表，请检查表名！", 'error');
+
+      // ---------------------------------------------------------
+      // 3. 扫描：空间/房间表 (平面图数据)
+      // ---------------------------------------------------------
+      const potentialSpaceTables = ['rooms', 'spaces', 'zones', 'map_nodes'];
+      for (const table of potentialSpaceTables) {
+        const { data, error } = await supabase.from(table).select('*').limit(1);
+        if (!error) {
+          log(`发现空间表: [${table}]`, 'success');
+          if (data && data.length > 0) {
+            log(`  👉 字段列表: ${Object.keys(data[0]).join(', ')}`, 'info');
+          } else {
+            log(`  ⚠️ 表 [${table}] 存在但为空。`, 'warn');
+          }
+        }
+      }
+
+      // ---------------------------------------------------------
+      // 4. 扫描：资产/家具表 (装修功能)
+      // ---------------------------------------------------------
+      const potentialItemTables = ['items', 'assets', 'furniture', 'inventory'];
+      for (const table of potentialItemTables) {
+        const { data, error } = await supabase.from(table).select('*').limit(1);
+        if (!error) {
+          log(`发现物品表: [${table}]`, 'success');
+        }
+      }
+
       setLoading(false);
+      log("扫描完成。等待指令上传。", 'success');
     };
 
-    fetchData();
-  }, [supabase, router]);
-
-  // 加载中状态
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#020617] text-white flex items-center justify-center font-mono">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-xs text-emerald-500 animate-pulse">CONNECTING TO NEURAL NET...</p>
-        </div>
-      </div>
-    );
-  }
+    scan();
+  }, []);
 
   return (
-    // ⚠️ 注意：这里加了 pt-24，是为了给顶部的 GlobalNav 留出位置，防止被遮挡
-    <div className="min-h-screen bg-[#020617] text-white font-mono pt-24 px-4 sm:px-8 pb-12 selection:bg-emerald-500/30">
-      
-      {/* 欢迎头部 */}
-      <header className="max-w-6xl mx-auto mb-12 border-b border-white/10 pb-8 animate-in slide-in-from-bottom-4 duration-700">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
-          <div>
-             <h1 className="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight">
-               COMMAND CENTER
-             </h1>
-             <p className="text-xs text-zinc-500 uppercase tracking-widest">
-               Welcome back, Commander <span className="text-emerald-500">{user?.email?.split('@')[0]}</span>
-             </p>
-          </div>
-          <div className="flex gap-4">
-             <div className="bg-zinc-900/50 border border-zinc-800 px-4 py-2 rounded-lg text-right">
-                <div className="text-[10px] text-zinc-500 uppercase">Active Entities</div>
-                <div className="text-xl font-bold text-white">{pets.length}</div>
-             </div>
-             <div className="bg-zinc-900/50 border border-zinc-800 px-4 py-2 rounded-lg text-right">
-                <div className="text-[10px] text-zinc-500 uppercase">System Status</div>
-                <div className="text-xl font-bold text-emerald-500 animate-pulse">ONLINE</div>
-             </div>
-          </div>
+    <div className="min-h-screen bg-black text-green-500 font-mono p-8 overflow-y-auto selection:bg-green-900">
+      <div className="max-w-4xl mx-auto border border-green-800 rounded-lg bg-black shadow-[0_0_20px_rgba(0,255,0,0.1)]">
+        <div className="bg-green-900/20 border-b border-green-800 p-4 flex justify-between items-center">
+          <h1 className="font-bold text-lg">SYSTEM DIAGNOSTIC TERMINAL</h1>
+          {loading && <div className="animate-pulse">SCANNING...</div>}
         </div>
-      </header>
-
-      {/* 核心内容区 */}
-      <main className="max-w-6xl mx-auto">
-        
-        {/* 如果没有宠物 */}
-        {pets.length === 0 ? (
-          <div className="bg-zinc-900/30 border border-dashed border-zinc-800 rounded-2xl p-12 text-center animate-in zoom-in-95 duration-500">
-            <div className="text-6xl mb-6 opacity-20">🧬</div>
-            <h2 className="text-xl font-bold text-zinc-300 mb-2">No Active Lifeforms Detected</h2>
-            <p className="text-sm text-zinc-500 mb-8 max-w-md mx-auto">
-              您的空间扇区目前是空的。请前往注册局初始化您的第一个硅基伴生体。
-            </p>
-            <button 
-              onClick={() => router.push('/registry')}
-              className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-8 rounded-full transition-all shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:shadow-[0_0_30px_rgba(16,185,129,0.4)]"
-            >
-              INITIALIZE NEW LIFE (去铸造)
-            </button>
-          </div>
-        ) : (
-          // 如果有宠物 -> 卡片网格
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in slide-in-from-bottom-8 duration-700">
-            {pets.map((pet) => (
-              <div 
-                key={pet.id}
-                onClick={() => router.push(`/pet-profile?id=${pet.id}`)} // 点击去详情页(如果有的话)
-                className="group relative bg-zinc-900/40 border border-white/5 hover:border-emerald-500/50 rounded-xl p-6 cursor-pointer transition-all hover:-translate-y-1 overflow-hidden"
-              >
-                {/* 装饰背景 */}
-                <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl group-hover:bg-emerald-500/10 transition-colors"></div>
-
-                <div className="relative z-10">
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="w-12 h-12 bg-black border border-zinc-800 rounded-lg flex items-center justify-center text-2xl group-hover:border-emerald-500/50 transition-colors">
-                      🐱
-                    </div>
-                    <span className="px-2 py-1 bg-emerald-900/20 border border-emerald-500/20 text-emerald-400 text-[9px] font-bold rounded uppercase">
-                      {pet.status || 'Active'}
-                    </span>
-                  </div>
-                  
-                  <h3 className="text-lg font-bold text-white mb-1 group-hover:text-emerald-400 transition-colors">{pet.name}</h3>
-                  <p className="text-[10px] text-zinc-500 font-mono mb-4">ID: {pet.id.slice(0, 8)}...{pet.id.slice(-4)}</p>
-                  
-                  <div className="w-full bg-zinc-800 h-1 rounded-full overflow-hidden">
-                    <div className="bg-emerald-500 h-full w-[70%]"></div>
-                  </div>
-                  <div className="flex justify-between mt-1">
-                    <span className="text-[8px] text-zinc-600">ENERGY</span>
-                    <span className="text-[8px] text-emerald-500">70%</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-
-            {/* 一个永远存在的“添加”卡片 */}
-            <div 
-               onClick={() => router.push('/registry')}
-               className="border border-dashed border-zinc-800 hover:border-zinc-600 hover:bg-zinc-900/30 rounded-xl p-6 flex flex-col items-center justify-center cursor-pointer transition-all min-h-[200px] group"
-            >
-               <div className="w-12 h-12 rounded-full bg-zinc-900 flex items-center justify-center text-zinc-500 text-2xl mb-3 group-hover:text-white group-hover:bg-zinc-800 transition-colors">+</div>
-               <span className="text-xs font-bold text-zinc-500 group-hover:text-zinc-300">ADD NEW ENTITY</span>
+        <div className="p-6 space-y-3 text-xs md:text-sm">
+          {logs.map((log, i) => (
+            <div key={i} className="break-all border-b border-green-900/30 pb-1">{log}</div>
+          ))}
+          {!loading && (
+            <div className="mt-8 pt-4 border-t border-green-800 text-white">
+              <p className="mb-2">👉 <strong>请执行以下操作：</strong></p>
+              <p>1. 截图或复制上方所有绿色文字。</p>
+              <p>2. 发送给 AI 助手。</p>
+              <p>3. 我将根据扫描到的真实字段，把 Word 文档里的旧功能重新接驳上去。</p>
             </div>
-          </div>
-        )}
-
-      </main>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
